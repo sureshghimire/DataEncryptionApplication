@@ -1,0 +1,179 @@
+package com.cs4780.sdesprogram;
+
+import java.util.*;
+
+public class Sdes {
+
+	@SuppressWarnings("resource")
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String plaintext;
+		String rawkey;
+		
+		Scanner sc = new Scanner(System.in);
+		
+		try {
+			System.out.println("Enter 8-bit plaintext: ");
+			plaintext = sc.next();
+			
+			System.out.println("Enter a 10-bit raw key: ");
+			rawkey = sc.next();
+			
+			GenerateKeys(rawkey);
+			DoEncryption(plaintext);
+		}
+			
+	    catch(InputMismatchException e)
+	    {
+	      System.out.println("Invalid Input.");
+	    }
+		
+	}
+
+	private static void DoEncryption(String plaintext) {
+		// TODO Auto-generated method stub
+		int[] message = new int[8];
+		
+		for(int i = 0; i < 8; i++) {
+			char a = plaintext.charAt(i);
+			message[i] = Integer.parseInt(Character.toString(a));
+			if(message[i] != 0 && message[i] !=1) {
+				System.out.println("Invalid Plaintext Given. Terminating Program.");
+				System.exit(0);
+				return;
+			}
+		}
+		
+		int[] ipPT = pIP(message);
+		int[] invipPT = invpIP(message);
+	}
+
+	private static int[] invpIP(int[] message) {
+		// TODO Auto-generated method stub
+		int[] invipkey = new int [8];
+		
+		invipkey[0] = message[3];
+		invipkey[1] = message[0];
+		invipkey[2] = message[2];
+		invipkey[3] = message[4];
+		invipkey[4] = message[6];
+		invipkey[5] = message[1];
+		invipkey[6] = message[7];
+		invipkey[7] = message[5];
+		
+		return invipkey;
+	}
+
+	private static int[] pIP(int[] message) {
+		// TODO Auto-generated method stub
+		int[] ipkey = new int [8];
+		
+		ipkey[0] = message[1];
+		ipkey[1] = message[5];
+		ipkey[2] = message[2];
+		ipkey[3] = message[0];
+		ipkey[4] = message[3];
+		ipkey[5] = message[7];
+		ipkey[6] = message[4];
+		ipkey[7] = message[6];
+		
+		return ipkey;
+	}
+
+	private static void GenerateKeys(String rawkey) {
+		// TODO Auto-generated method stub
+		int[] key = new int[10];
+		
+		for(int i = 0; i < 10; i++) {
+			char a = rawkey.charAt(i);
+			key[i] = Integer.parseInt(Character.toString(a));
+			if(key[i] != 0 && key[i] !=1) {
+				System.out.println("Invalid Raw Key Given. Terminating Program.");
+				System.exit(0);
+				return;
+			}
+		}
+		
+		int[] p10key = P10(key);
+		int[] keyLS1 = keyLS1(p10key);
+		int[] subKey1 = P8(keyLS1);
+
+		System.out.println("Subkey 1: " + Arrays.toString(subKey1));	
+		
+		int[] keyLS2 = keyLS2(keyLS1);
+		int[] subKey2 = P8(keyLS2);
+		
+		System.out.println("Subkey 2: " + Arrays.toString(subKey2));	
+	}
+
+	private static int[] keyLS2(int[] keyLS1) {
+		// TODO Auto-generated method stub
+		int[] keyLS2 = new int [10];
+		
+		keyLS2[0] = keyLS1[2];
+		keyLS2[1] = keyLS1[3];
+		keyLS2[2] = keyLS1[4];
+		keyLS2[3] = keyLS1[0];
+		keyLS2[4] = keyLS1[1];
+		keyLS2[5] = keyLS1[7];
+		keyLS2[6] = keyLS1[8];
+		keyLS2[7] = keyLS1[9];
+		keyLS2[8] = keyLS1[5];
+		keyLS2[9] = keyLS1[6];
+		
+		return keyLS2;
+	}
+
+	private static int[] P8(int[] keyLS) {
+		// TODO Auto-generated method stub
+		int[] p8key = new int [8];
+		
+		p8key[0] = keyLS[5];
+		p8key[1] = keyLS[2];
+		p8key[2] = keyLS[6];
+		p8key[3] = keyLS[3];
+		p8key[4] = keyLS[7];
+		p8key[5] = keyLS[4];
+		p8key[6] = keyLS[9];
+		p8key[7] = keyLS[8];
+		
+		return p8key;
+	}
+
+	private static int[] keyLS1(int[] p10key) {
+		// TODO Auto-generated method stub
+		int[] keyLS1 = new int [10];
+		
+		keyLS1[0] = p10key[1];
+		keyLS1[1] = p10key[2];
+		keyLS1[2] = p10key[3];
+		keyLS1[3] = p10key[4];
+		keyLS1[4] = p10key[0];
+		keyLS1[5] = p10key[6];
+		keyLS1[6] = p10key[7];
+		keyLS1[7] = p10key[8];
+		keyLS1[8] = p10key[9];
+		keyLS1[9] = p10key[5];
+		
+		return keyLS1;
+	}
+
+	private static int[] P10(int[] key) {
+		// TODO Auto-generated method stub
+		int[] p10Key = new int [10];
+
+		p10Key[0] = key[2];
+	    p10Key[1] = key[4];
+	    p10Key[2] = key[1];
+	    p10Key[3] = key[6];
+	    p10Key[4] = key[3];
+	    p10Key[5] = key[9];
+	    p10Key[6] = key[0];
+	    p10Key[7] = key[8];
+	    p10Key[8] = key[7];
+	    p10Key[9] = key[5];
+	    
+	    return p10Key;
+	}
+		
+}
